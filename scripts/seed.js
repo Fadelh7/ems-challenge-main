@@ -18,13 +18,43 @@ const db = new sqlite3.Database(sqlitePath);
 
 const employees = [
   {
-    full_name: 'John Doe'
+    full_name: 'John Doe',
+    email: 'john.doe@example.com',
+    phone: '123-456-7890',
+    date_of_birth: '1990-01-01',
+    job_title: 'Software Engineer',
+    department: 'Engineering',
+    salary: 80000,
+    start_date: '2020-01-15',
+    end_date: null,
+    photo_path: null,
+    cv_path: null
   },
   {
-    full_name: 'Jane Smith'
+    full_name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    phone: '234-567-8901',
+    date_of_birth: '1985-05-20',
+    job_title: 'Product Manager',
+    department: 'Product',
+    salary: 95000,
+    start_date: '2018-03-10',
+    end_date: null,
+    photo_path: null,
+    cv_path: null
   },
   {
-    full_name: 'Alice Johnson'
+    full_name: 'Alice Johnson',
+    email: 'alice.johnson@example.com',
+    phone: '345-678-9012',
+    date_of_birth: '1992-09-12',
+    job_title: 'Designer',
+    department: 'Design',
+    salary: 70000,
+    start_date: '2021-07-01',
+    end_date: null,
+    photo_path: null,
+    cv_path: null
   },
 ];
 
@@ -33,16 +63,19 @@ const timesheets = [
     employee_id: 1,
     start_time: '2025-02-10 08:00:00',
     end_time: '2025-02-10 17:00:00',
+    summary: 'Worked on frontend features.'
   },
   {
     employee_id: 2,
     start_time: '2025-02-11 12:00:00',
     end_time: '2025-02-11 17:00:00',
+    summary: 'Product planning and meetings.'
   },
   {
     employee_id: 3,
     start_time: '2025-02-12 07:00:00',
     end_time: '2025-02-12 16:00:00',
+    summary: 'Created new design mockups.'
   },
 ];
 
