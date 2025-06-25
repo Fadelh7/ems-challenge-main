@@ -18,67 +18,47 @@ const db = new sqlite3.Database(sqlitePath);
 
 const employees = [
   {
-    full_name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '123-456-7890',
-    date_of_birth: '1990-01-01',
-    job_title: 'Software Engineer',
-    department: 'Engineering',
-    salary: 80000,
-    start_date: '2020-01-15',
+    full_name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "123-456-7890",
+    date_of_birth: "1990-05-15",
+    job_title: "Software Engineer",
+    department: "Engineering",
+    salary: 6000,
+    start_date: "2022-01-10",
     end_date: null,
-    photo_path: null,
-    cv_path: null
+    photo_path: "/uploads/john_doe.jpg",
+    document_path: "/uploads/john_doe_cv.pdf"
   },
   {
-    full_name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '234-567-8901',
-    date_of_birth: '1985-05-20',
-    job_title: 'Product Manager',
-    department: 'Product',
-    salary: 95000,
-    start_date: '2018-03-10',
+    full_name: "Jane Smith",
+    email: "jane.smith@example.com",
+    phone: "987-654-3210",
+    date_of_birth: "1985-08-25",
+    job_title: "HR Manager",
+    department: "Human Resources",
+    salary: 7000,
+    start_date: "2021-06-15",
     end_date: null,
-    photo_path: null,
-    cv_path: null
-  },
-  {
-    full_name: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
-    phone: '345-678-9012',
-    date_of_birth: '1992-09-12',
-    job_title: 'Designer',
-    department: 'Design',
-    salary: 70000,
-    start_date: '2021-07-01',
-    end_date: null,
-    photo_path: null,
-    cv_path: null
-  },
+    photo_path: "/uploads/jane_smith.jpg",
+    document_path: "/uploads/jane_smith_cv.pdf"
+  }
 ];
 
 const timesheets = [
-  {
-    employee_id: 1,
-    start_time: '2025-02-10 08:00:00',
-    end_time: '2025-02-10 17:00:00',
-    summary: 'Worked on frontend features.'
+  { 
+    employee_id: 1, 
+    start_time: "2024-02-01 09:00:00", 
+    end_time: "2024-02-01 17:00:00", 
+    work_summary: "Developed new feature X." 
   },
-  {
-    employee_id: 2,
-    start_time: '2025-02-11 12:00:00',
-    end_time: '2025-02-11 17:00:00',
-    summary: 'Product planning and meetings.'
-  },
-  {
-    employee_id: 3,
-    start_time: '2025-02-12 07:00:00',
-    end_time: '2025-02-12 16:00:00',
-    summary: 'Created new design mockups.'
-  },
+  { 
+    employee_id: 2, 
+    start_time: "2024-02-02 08:30:00", 
+    end_time: "2024-02-02 16:30:00", 
+    work_summary: "Conducted interviews and onboarding." 
+  }
 ];
-
 
 const insertData = (table, data) => {
   const columns = Object.keys(data[0]).join(', ');
@@ -94,6 +74,9 @@ const insertData = (table, data) => {
 };
 
 db.serialize(() => {
+  db.run("DELETE FROM employees");
+  db.run("DELETE FROM timesheets");
+
   insertData('employees', employees);
   insertData('timesheets', timesheets);
 });
@@ -105,4 +88,3 @@ db.close(err => {
     console.log('Database seeded successfully.');
   }
 });
-

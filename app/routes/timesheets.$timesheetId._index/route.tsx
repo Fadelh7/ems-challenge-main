@@ -1,80 +1,61 @@
-import { Form, useLoaderData, redirect, useActionData } from "react-router";
+import { useLoaderData, redirect, type LoaderFunction, type ActionFunction } from "react-router-dom";
 import { getDB } from "~/db/getDB";
+import { FaArrowRight } from "react-icons/fa";
+import TimesheetForm from "~/components/timesheetForm";
 
-export async function loader({ params }: any) {
+export const loader: LoaderFunction = async ({ params }) => {
   const db = await getDB();
   const timesheet = await db.get("SELECT * FROM timesheets WHERE id = ?", [params.timesheetId]);
-  const employees = await db.all('SELECT id, full_name FROM employees');
-  return { timesheet, employees };
-}
-
-export const action = async ({ request, params }: any) => {
-  const formData = await request.formData();
-  const employee_id = formData.get("employee_id");
-  const start_time = formData.get("start_time");
-  const end_time = formData.get("end_time");
-  const summary = formData.get("summary");
-
-  // Validation
-  const errors: any = {};
-  if (!employee_id) errors.employee_id = "Employee is required";
-  if (!start_time) errors.start_time = "Start time is required";
-  if (!end_time) errors.end_time = "End time is required";
-  if (start_time && end_time && new Date(start_time as string) >= new Date(end_time as string)) {
-    errors.end_time = "End time must be after start time";
+  if (!timesheet) {
+    throw new Response("Timesheet not found", { status: 404 });
   }
-  if (Object.keys(errors).length > 0) {
-    return errors;
+  
+  const employees = await db.all("SELECT id, full_name FROM employees");
+  return { timesheet, employees };
+};
+
+export const action: ActionFunction = async ({ request, params }) => {
+  const formData = await request.formData();
+  const timesheetData = {
+    employee_id: formData.get("employee_id"),
+    start_time: formData.get("start_time"),
+    end_time: formData.get("end_time"),
+    work_summary: formData.get("work_summary"),
+  };
+
+  if (!timesheetData.employee_id || !timesheetData.start_time || !timesheetData.end_time) {
+    throw new Response("Missing required fields", { status: 400 });
+  }
+
+  if (new Date(timesheetData.end_time as string) <= new Date(timesheetData.start_time as string)) {
+    throw new Response("End time must be after start time", { status: 400 });
   }
 
   const db = await getDB();
   await db.run(
-    `UPDATE timesheets SET employee_id=?, start_time=?, end_time=?, summary=? WHERE id=?`,
-    [employee_id, start_time, end_time, summary, params.timesheetId]
+    "UPDATE timesheets SET employee_id=?, start_time=?, end_time=?, work_summary=? WHERE id=?",
+    [timesheetData.employee_id, timesheetData.start_time, timesheetData.end_time, timesheetData.work_summary, params.timesheetId]
   );
+
   return redirect("/timesheets");
 };
 
-export default function TimesheetPage() {
-  const { timesheet, employees } = useLoaderData() as any;
-  const errors = useActionData() as any;
-  if (!timesheet) return <div>Timesheet not found</div>;
+export default function EditTimesheetPage() {
+  const { timesheet, employees } = useLoaderData() as { 
+    timesheet: { id: number, employee_id: number, start_time: string, end_time: string, work_summary: string };
+    employees: { id: number; full_name: string }[] 
+  };
+
   return (
-    <div className="container">
-      <h1>Edit Timesheet</h1>
-      <Form method="post">
-        <div>
-          <label htmlFor="employee_id">Employee</label>
-          <select name="employee_id" id="employee_id" required defaultValue={timesheet.employee_id}>
-            <option value="">Select employee</option>
-            {employees.map((e: any) => (
-              <option key={e.id} value={e.id}>{e.full_name}</option>
-            ))}
-          </select>
-          {errors?.employee_id && <div className="error">{errors.employee_id}</div>}
-        </div>
-        <div>
-          <label htmlFor="start_time">Start Time</label>
-          <input type="datetime-local" name="start_time" id="start_time" defaultValue={timesheet.start_time} required />
-          {errors?.start_time && <div className="error">{errors.start_time}</div>}
-        </div>
-        <div>
-          <label htmlFor="end_time">End Time</label>
-          <input type="datetime-local" name="end_time" id="end_time" defaultValue={timesheet.end_time} required />
-          {errors?.end_time && <div className="error">{errors.end_time}</div>}
-        </div>
-        <div>
-          <label htmlFor="summary">Summary</label>
-          <input type="text" name="summary" id="summary" defaultValue={timesheet.summary || ''} />
-        </div>
-        <button type="submit" className="button">Update Timesheet</button>
-      </Form>
-      <hr />
-      <ul className="flex gap-2 mt-2">
-        <li><a href="/timesheets" className="button">Timesheets</a></li>
-        <li><a href="/timesheets/new" className="button">New Timesheet</a></li>
-        <li><a href="/employees/" className="button">Employees</a></li>
-      </ul>
+    <div className="p-6 bg-gradient-to-br from-gray-900 to-black min-h-screen text-white">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Edit Timesheet</h1>
+        <TimesheetForm 
+          employees={employees} 
+          defaultValues={timesheet} 
+          buttonText="Update Timesheet" 
+        />
+      </div>
     </div>
   );
 }
