@@ -124,7 +124,7 @@ export default function TimesheetsPage() {
             </table>
           </div>
         ) : view === "calendar" ? (
-          <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+          <div className="sx-react-calendar-wrapper bg-gray-800 rounded-lg p-4 shadow-lg">
             <ScheduleXCalendar calendarApp={calendar} />
           </div>
         ) : (
